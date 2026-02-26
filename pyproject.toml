@@ -12,12 +12,18 @@ dependencies = [
     "alembic (>=1.18.4,<2.0.0)",
     "uvicorn (>=0.41.0,<0.42.0)",
     "pydantic-settings (>=2.13.1,<3.0.0)",
-    "gradio (>=6.6.0,<7.0.0)"
+    "gradio (>=6.6.0,<7.0.0)",
+    "sqlalchemy (>=2.0.47,<3.0.0)"
 ]
 
 [tool.poetry]
 packages = [{include = "news_ai_analysis", from = "src"}]
 
+
+[tool.poetry.group.dev.dependencies]
+black = "^26.1.0"
+pytest = "^9.0.2"
+flake8 = "^7.3.0"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
