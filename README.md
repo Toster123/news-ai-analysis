@@ -1,15 +1,29 @@
-## Структура
+## Взаимодействие пользователя
+### Запуск
+- pip install -r requirements.txt
+- streamlit run app.py
+- gunicorn src.news_ai_analysis.main:app -w 4 -k uvicorn.workers.UvicornWorker -b 127.0.0.1:8000
+- (или) gunicorn src.news_ai_analysis.main:app -w 4 -k uvicorn.workers.UvicornWorker -b 0.0.0.0:8000
 
-news_monitor/
+## Взаимодействие разработчиков
+Главная ветка main (думаю что без dev)  
+Создаем от нее ветку согласно конвенции по issue, а дальше pr в main на code-review
 
-├── app.py           # Основное приложение Streamlit
+## Архитектура
+### Общий принцип
+Придерживаюсь такой архитектуре https://github.com/zhanymkanov/fastapi-best-practices, но проект создал через `poetry new <название проекта>` из-за чего есть дополнительный уровень вложенности в src (как почитал, это для импортов будет полезно). В src/news_ai_analysis папки стараюсь создавать как отдельный типо сервис, который отвечает за определенную часть. Пока нет общего представления проекта, поэтому раскинул базово
 
-└── requirements.txt # Зависимости
+### Тестирование
+Создал отедльную папку - все в зависимости от времени, будем или нет писать их...
 
-## Запуск локально
+### Файл .env
+Создавать в корневой директории по аналогии с .env-example
 
-cd /workspace/news_monitor
-
-pip install -r requirements.txt
-
-streamlit run app.py
+### Технологии
+- **Асинхронный FastAPI** для написания api
+- **Асинхронный Alembic** для создания и применения миграций
+- **Gradio** для интерфейся
+- **Docker и docker compose** для развертывания
+- **Poetry** для настройки python-проекта
+- **SQLAlchemy** для работы с БД
+- **Black, pytest, flake8** для линтинга и тестирования
