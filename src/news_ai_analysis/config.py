@@ -29,6 +29,7 @@ class DatabaseConfig(ConfigBase):
 
 class Config(BaseSettings):
     db: DatabaseConfig = field(default_factory=DatabaseConfig)
+    backend_api_endpoint: str = field(default="http://localhost:8000/api")
 
     @classmethod
     def load(cls) -> "Config":
