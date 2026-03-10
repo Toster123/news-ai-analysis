@@ -2,8 +2,6 @@
 ### Запуск
 - pip install -r requirements.txt
 - streamlit run app.py
-- gunicorn src.news_ai_analysis.main:app -w 4 -k uvicorn.workers.UvicornWorker -b 127.0.0.1:8000
-- (или) gunicorn src.news_ai_analysis.main:app -w 4 -k uvicorn.workers.UvicornWorker -b 0.0.0.0:8000
 
 ## Взаимодействие разработчиков
 Главная ветка main (думаю что без dev)  
