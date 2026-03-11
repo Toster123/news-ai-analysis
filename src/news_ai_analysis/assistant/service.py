@@ -5,7 +5,7 @@ from ..llm.service import LLM
 
 
 class Assistant:
-    def __init__(self, llm: LLM = LLM(), system_prompt: None | str = SYSTEM_PROMPT):
+    def __init__(self, llm: LLM, system_prompt: None | str = SYSTEM_PROMPT):
         self.llm = llm
         self.__system_prompt = system_prompt
 

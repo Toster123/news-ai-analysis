@@ -27,7 +27,7 @@ from src.news_ai_analysis.assistant.service import Assistant
 class App:
     def __init__(self):
         # self.__llm = LLM()
-        # self.__asistant = Assistant(llm)
+        # self.__asistant = Assistant(self.__llm)
         # # TODO
         # self.__embedder = (llm)
         # self.__tone_evaluator = (llm)
