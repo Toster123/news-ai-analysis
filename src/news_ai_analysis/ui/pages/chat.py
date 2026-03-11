@@ -1,5 +1,6 @@
 from src.news_ai_analysis.ui.utils import *
 
+
 class Chat:
     def __init__(self):
         """Раздел: AI Ассистент"""
@@ -31,9 +32,10 @@ class Chat:
             # Генерация ответа (заглушка)
             with st.chat_message("assistant"):
                 with st.spinner("Анализирую данные..."):
+                    # response = self.__assistant.create_chat_completion(st.session_state.messages)
+
                     import time
                     time.sleep(1.5)  # Имитация обработки
-
                     # Демо ответ
                     response = f"""📊 **Результаты анализа по запросу: "{prompt}"**
 

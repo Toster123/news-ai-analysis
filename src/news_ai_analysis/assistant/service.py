@@ -7,12 +7,12 @@ from ..llm.service import LLM
 class Assistant:
     def __init__(self, llm: LLM = LLM(), system_prompt: None | str = SYSTEM_PROMPT):
         self.llm = llm
-        self._system_prompt = system_prompt
+        self.__system_prompt = system_prompt
 
     def create_chat_completion(self, messages: list[Dict]) -> str:
-        if self._system_prompt:
+        if self.__system_prompt:
             messages = [
-                {"role": "system", "content": self._system_prompt}] + messages
+                {"role": "system", "content": self.__system_prompt}] + messages
 
         i = 0
         while i < config.MAX_QUERIES and "<questions>" in (latest_message := extract_content((messages := self.llm.create_chat_completion(messages))[-1])):

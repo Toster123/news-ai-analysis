@@ -1,5 +1,6 @@
 from src.news_ai_analysis.ui.utils import *
 
+
 class Sentiment:
     def __init__(self):
         """Раздел: Анализ тональности"""

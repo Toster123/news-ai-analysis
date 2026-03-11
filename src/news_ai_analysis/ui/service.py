@@ -12,18 +12,26 @@
 """
 
 
+import uuid
+import streamlit as st
 from src.news_ai_analysis.ui.pages.sources import Sources
 from src.news_ai_analysis.ui.pages.feed import Feed
 from src.news_ai_analysis.ui.pages.sentiment import Sentiment
 from src.news_ai_analysis.ui.pages.chat import Chat
 from src.news_ai_analysis.ui.pages.system import System
 from src.news_ai_analysis.ui.pages.settings import Settings
-import streamlit as st
-import uuid
+from src.news_ai_analysis.llm.service import LLM
+from src.news_ai_analysis.assistant.service import Assistant
 
 
 class App:
     def __init__(self):
+        # self.__llm = LLM()
+        # self.__asistant = Assistant(llm)
+        # # TODO
+        # self.__embedder = (llm)
+        # self.__tone_evaluator = (llm)
+
         # Конфигурация страницы
         st.set_page_config(
             page_title="NewsTrend Monitor",
