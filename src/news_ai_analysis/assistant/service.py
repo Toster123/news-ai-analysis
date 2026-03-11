@@ -2,12 +2,14 @@ from .config import config
 from .constants import *
 from ..llm.utils import *
 from ..llm.service import LLM
+from ..rag.service import Vectorstore
 
 
 class Assistant:
-    def __init__(self, llm: LLM, system_prompt: None | str = SYSTEM_PROMPT):
+    def __init__(self, llm: LLM, vectorstore: Vectorstore, system_prompt: None | str = SYSTEM_PROMPT):
         self.llm = llm
         self.__system_prompt = system_prompt
+        self.__vectorstore = vectorstore
 
     def create_chat_completion(self, messages: list[Dict]) -> str:
         if self.__system_prompt:
