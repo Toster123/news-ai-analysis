@@ -30,7 +30,7 @@ class App:
         # self.__asistant = Assistant(self.__llm)
         # # TODO
         # self.__embedder = (llm)
-        # self.__tone_evaluator = (llm)
+        # self.__sentiment_evaluator = (llm)
 
         # Конфигурация страницы
         st.set_page_config(
