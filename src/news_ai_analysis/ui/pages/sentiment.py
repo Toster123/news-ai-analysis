@@ -7,6 +7,44 @@ class Sentiment:
 
         st.title("💭 Анализ тональности")
 
+        st.subheader("🔑 Ключевые слова для анализа тональности")
+
+        if 'sentiment_keywords' not in st.session_state:
+            st.session_state.sentiment_keywords = []
+
+        selected_keywords = []
+        for idx, keyword in enumerate(st.session_state.sentiment_keywords):
+            col1, col2 = st.columns([0.1, 0.9])
+            with col1:
+                if st.checkbox("Выбрать", key=f"del_keyword_{idx}"):
+                    selected_keywords.append(keyword)
+            with col2:
+                st.write(keyword)
+
+        if selected_keywords:
+            if st.button("🗑️ Удалить выбранные ключевые слова", key="remove_selected_keywords"):
+                st.session_state.sentiment_keywords = [kw for kw in st.session_state.sentiment_keywords if kw not in selected_keywords]
+                st.success("Ключевые слова удалены!")
+                st.rerun()
+        else:
+            st.info("Выберите ключевые слова для удаления")
+
+        with st.form("add_keyword_form"):
+            new_keyword = st.text_input("Новое ключевое слово", placeholder="Введите ключевое слово...")
+            submitted = st.form_submit_button("Добавить")
+            if submitted:
+                if new_keyword and new_keyword.strip():
+                    if new_keyword.strip() not in st.session_state.sentiment_keywords:
+                        st.session_state.sentiment_keywords.append(new_keyword.strip())
+                        st.success(f"Ключевое слово '{new_keyword}' добавлено!")
+                        st.rerun()
+                    else:
+                        st.error("Это ключевое слово уже есть в списке.")
+                else:
+                    st.error("Пожалуйста, введите ключевое слово.")
+
+        st.markdown("---")
+
         # Сводная статистика
         st.subheader("Сводка")
 
