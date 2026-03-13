@@ -1,5 +1,6 @@
 from typing import Dict
 from .config import config
+from src.news_ai_analysis.config import config as global_config
 from .utils import *
 from llama_cpp import Llama
 
@@ -11,7 +12,7 @@ class LLM():
             filename=config.MODEL,
             n_gpu_layers=-1,
             verbose=False
-        )
+        ) if not global_config.DISABLE_LOCAL_MODELS else None
 
     def create_chat_completion(self, messages: list[Dict]) -> list[Dict]:
         messages.append({"role": "assistant", "content": self.llm.create_chat_completion(

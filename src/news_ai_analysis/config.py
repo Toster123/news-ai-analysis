@@ -29,6 +29,7 @@ class DatabaseConfig(ConfigBase):
 
 class Config(BaseSettings):
     db: DatabaseConfig = field(default_factory=DatabaseConfig)
+    DISABLE_LOCAL_MODELS: bool = field(default=True)
 
     @classmethod
     def load(cls) -> "Config":

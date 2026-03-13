@@ -24,14 +24,19 @@ httpx==0.28.1
 huggingface_hub==1.6.0
 idna==3.11
 Jinja2==3.1.6
+jsonpatch==1.33
+jsonpointer==3.0.0
 jsonschema==4.26.0
 jsonschema-specifications==2025.9.1
+langchain-core==1.2.18
+langsmith==0.7.17
 llama_cpp_python==0.3.16
 markdown-it-py==4.0.0
 MarkupSafe==3.0.3
 mdurl==0.1.2
 narwhals==2.17.0
 numpy==2.4.3
+orjson==3.11.7
 packaging==26.0
 pandas==2.3.3
 pillow==12.1.1
@@ -49,6 +54,7 @@ pytz==2026.1.post1
 PyYAML==6.0.3
 referencing==0.37.0
 requests==2.32.5
+requests-toolbelt==1.0.0
 rich==14.3.3
 rpds-py==0.30.0
 shellingham==1.5.4
@@ -66,5 +72,7 @@ typing-inspection==0.4.2
 typing_extensions==4.15.0
 tzdata==2025.3
 urllib3==2.6.3
+uuid_utils==0.14.1
 uvicorn==0.41.0
-sentence_transformers==5.2.3
+xxhash==3.6.0
+zstandard==0.25.0

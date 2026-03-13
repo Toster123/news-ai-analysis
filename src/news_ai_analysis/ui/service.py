@@ -22,15 +22,15 @@ from src.news_ai_analysis.ui.pages.system import System
 from src.news_ai_analysis.ui.pages.settings import Settings
 from src.news_ai_analysis.llm.service import LLM
 from src.news_ai_analysis.assistant.service import Assistant
+from src.news_ai_analysis.rag.service import Vectorstore
 
 
 class App:
     def __init__(self):
-        # self.__llm = LLM()
-        # self.__asistant = Assistant(self.__llm)
-        # # TODO
-        # self.__embedder = (llm)
-        # self.__sentiment_evaluator = (llm)
+        st.session_state.llm = LLM()
+        st.session_state.asistant = Assistant(self.__llm)
+        st.session_state.vectorstore = Vectorstore()
+        # self.__sentiment_evaluator = SentimentEvaluator(llm)
 
         # Конфигурация страницы
         st.set_page_config(
