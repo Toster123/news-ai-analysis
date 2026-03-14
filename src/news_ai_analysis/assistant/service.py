@@ -21,11 +21,13 @@ class Assistant:
             queries = latest_message.split(
                 "<questions>\n")[-1].split("\n</questions>")[0].split("\n")
 
-            k = [int(q.split("; k=")[-1]) if "; k=" in q else config.MAX_K for q in queries]
-            queries = [q.split("; k=")[0] for q in queries]
+            queries = [{"query": q.split("; k=")[0], "k": int(q.split("; k=")[-1]) if "; k=" in q else config.MAX_K} for q in queries]
 
-            # TODO: rag search and format
-            found_news_formatted = ""
+            found_news = distinct_documents(self.__vectorstore.search(queries))
+            found_news_formatted = "\n\n".join([
+                f"{article.page_content}\n{article.metadata}" for article in found_news
+            ])
+
             messages.append({"role": "user", "content": found_news_formatted})
 
             i += 1

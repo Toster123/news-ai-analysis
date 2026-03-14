@@ -12,8 +12,8 @@ class Vectorstore():
     def __init__(self, path: str = config.VECTOR_STORE_PATH, embedding_model: str = config.EMBEDDING_MODEL):
         self.emb_model = SentenceTransformer(
             embedding_model) if not global_config.DISABLE_LOCAL_MODELS else None
-        # self.__vectorstore = FAISS.load_local(
-        #     os.getcwd() + path, self.emb_model, allow_dangerous_deserialization=True)
+        self.__vectorstore = FAISS.load_local(
+            os.getcwd() + path, self.emb_model, allow_dangerous_deserialization=True)
 
     def add_documents(self, documents: list[Document]):
         self.__vectorstore.add_documents(documents)
