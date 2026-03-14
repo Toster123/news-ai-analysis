@@ -6,6 +6,7 @@
 import uuid
 import streamlit as st
 from datetime import datetime
+from news_ai_analysis.config import config as global_config
 from news_ai_analysis.ui.pages.sources import Sources
 from news_ai_analysis.ui.pages.feed import Feed
 from news_ai_analysis.ui.pages.sentiment import Sentiment
@@ -28,7 +29,7 @@ class App:
 
         # Инициализация сервиса парсинга
         if 'parsing_service' not in st.session_state:
-            st.session_state.parsing_service = ParsingService(vectorstore=st.session_state.vectorstore)
+            st.session_state.parsing_service = ParsingService(db_url=global_config.db.db_url, vectorstore=st.session_state.vectorstore)
 
         # Конфигурация страницы
         st.set_page_config(
