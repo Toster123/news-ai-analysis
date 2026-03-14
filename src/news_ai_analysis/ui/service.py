@@ -27,11 +27,16 @@ from src.news_ai_analysis.rag.service import Vectorstore
 
 class App:
     def __init__(self):
-        st.session_state.llm = LLM()
-        st.session_state.asistant = Assistant(self.__llm)
-        st.session_state.vectorstore = Vectorstore()
-        # self.__sentiment_evaluator = SentimentEvaluator(llm)
-
+        # Инициализация компонентов с проверкой существования в session_state
+        if 'llm' not in st.session_state:
+            st.session_state.llm = LLM()
+        
+        if 'vectorstore' not in st.session_state:
+            st.session_state.vectorstore = Vectorstore()
+        
+        if 'assistant' not in st.session_state:  # Исправлено: asistant -> assistant
+            st.session_state.assistant = Assistant(st.session_state.llm, st.session_state.vectorstore)
+        
         # Конфигурация страницы
         st.set_page_config(
             page_title="NewsTrend Monitor",
@@ -145,7 +150,8 @@ class App:
                 use_container_width=True,
                 type="primary"
             ):
-                toggle_collector('start')
+                # Вызов функции для старта сборщика
+                self.toggle_collector('start')
                 st.rerun()
 
         with col2:
@@ -154,7 +160,8 @@ class App:
                 disabled=not status['running'],
                 use_container_width=True
             ):
-                toggle_collector('stop')
+                # Вызов функции для остановки сборщика
+                self.toggle_collector('stop')
                 st.rerun()
 
         # Метрики сборщика
@@ -167,3 +174,12 @@ class App:
         st.sidebar.caption("© 2026 NewsTrend Monitor")
 
         return pages[selected_page]
+    
+    def toggle_collector(self, action):
+        """Управление сборщиком новостей"""
+        if action == 'start':
+            st.session_state.collector_status['running'] = True
+            st.session_state.collector_status['start_time'] = 'Только что'
+        elif action == 'stop':
+            st.session_state.collector_status['running'] = False
+            st.session_state.collector_status['start_time'] = None

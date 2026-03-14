@@ -7,5 +7,6 @@ class LLMConfig(BaseSettings):
 
     MODEL_REPO: str = field(default="Qwen/Qwen3-8B-GGUF")
     MODEL: str = field(default="Qwen3-8B-Q4_K_M.gguf")
+    CONTEXT_SIZE: int = 2048
 
 config = LLMConfig()
