@@ -28,7 +28,7 @@ class App:
 
         # Инициализация сервиса парсинга
         if 'parsing_service' not in st.session_state:
-            st.session_state.parsing_service = ParsingService()
+            st.session_state.parsing_service = ParsingService(vectorstore=st.session_state.vectorstore)
 
         # Конфигурация страницы
         st.set_page_config(

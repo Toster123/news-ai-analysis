@@ -10,6 +10,7 @@ import streamlit as st
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import select, text
+from langchain_core.documents import Document
 
 from news_ai_analysis.parsing.fetcher import fetch_all_rss
 from news_ai_analysis.parsing.scraper import scrape_full_text
@@ -18,12 +19,13 @@ from news_ai_analysis.parsing.schemas import RSSArticle
 from news_ai_analysis.models import Base
 from news_ai_analysis.parsing.models import Article
 from news_ai_analysis.parsing.rss_config import RSS_SOURCES as DEFAULT_SOURCES
+from news_ai_analysis.rag.service import Vectorstore
 
 
 class ParsingService:
     """Сервис для управления парсингом новостей"""
     
-    def __init__(self, db_url: str = None):
+    def __init__(self, db_url: str = None, vectorstore: Vectorstore = None):
         """
         Инициализация сервиса с подключением к PostgreSQL
         
@@ -47,6 +49,9 @@ class ParsingService:
             class_=AsyncSession, 
             expire_on_commit=False
         )
+
+        self._vectorstore = vectorstore
+
         self._running = False
         self._thread = None
         
@@ -145,6 +150,18 @@ class ParsingService:
                     # Транзакция автоматически закоммитится при выходе из context manager
                     
             print(f"🎉 Собрано {len(saved_articles)} новых статей")
+
+            document_articles = [Document(page_content=article.title, metadata={
+                "id": article.id,
+                "source_name": article.source_name,
+                "url": article.url,
+                "published_at": article.published_at
+            }) for article in saved_articles]
+
+            self._vectorstore.add_documents(document_articles)            
+            self._vectorstore.save_local()            
+
+            print(f"🎉 В RAG добавлено {len(saved_articles)} новых статей")
             return saved_articles
             
         except Exception as e:
