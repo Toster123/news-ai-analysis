@@ -29,11 +29,11 @@ class Feed:
                 # Фильтр по источнику
                 sources = list(set(a['source_name'] for a in st.session_state.get('articles', [])))
                 sources.insert(0, "Все источники")
-                selected_source = st.selectbox("Источник", sources)
+                st.session_state.selected_source = st.selectbox("Источник", sources)
             
             with col2:
                 # Фильтр по дате
-                days = st.selectbox(
+                st.session_state.days = st.selectbox(
                     "За период",
                     [1, 3, 7, 14, 30, 90],
                     format_func=lambda x: f"Последние {x} дней"
@@ -41,7 +41,7 @@ class Feed:
             
             with col3:
                 # Фильтр по наличию контента
-                with_content = st.checkbox("Только с полным текстом")
+                st.session_state.with_content = st.checkbox("Только с полным текстом")
             
             # Кнопка обновления
             if st.button("🔄 Обновить", type="primary"):
@@ -51,9 +51,9 @@ class Feed:
         """Рендер ленты новостей"""
         # Получаем отфильтрованные статьи
         articles = get_articles(
-            source_name=selected_source if selected_source != "Все источники" else None,
-            days_back=days,
-            with_content=with_content,
+            source_name=st.session_state.selected_source if st.session_state.selected_source != "Все источники" else None,
+            days_back=st.session_state.days,
+            with_content=st.session_state.with_content,
             limit=50
         )
         

@@ -22,8 +22,8 @@ from news_ai_analysis.collector.service import ParsingService
 class App:
     def __init__(self):
         st.session_state.llm = LLM()
-        st.session_state.asistant = Assistant(self.__llm)
         st.session_state.vectorstore = Vectorstore()
+        st.session_state.asistant = Assistant(st.session_state.llm, st.session_state.vectorstore)
         # self.__sentiment_evaluator = SentimentEvaluator(llm)
 
         # Инициализация сервиса парсинга

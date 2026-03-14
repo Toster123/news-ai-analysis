@@ -3,7 +3,7 @@ from typing import Dict
 from .config import config
 from news_ai_analysis.config import config as global_config
 from .utils import *
-# from sentence_transformers import SentenceTransformer
+from sentence_transformers import SentenceTransformer
 from langchain_community.vectorstores import FAISS
 from langchain_core.documents import Document
 
