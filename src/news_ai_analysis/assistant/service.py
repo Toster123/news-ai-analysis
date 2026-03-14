@@ -21,7 +21,7 @@ class Assistant:
             queries = latest_message.split(
                 "<questions>\n")[-1].split("\n</questions>")[0].split("\n")
 
-            queries = [{"query": q.split("; k=")[0], "k": int(q.split("; k=")[-1]) if "; k=" in q else config.MAX_K} for q in queries]
+            queries = [{"query": q.split("; k=")[0], "k": min(int(q.split("; k=")[-1]), config.MAX_K) if "; k=" in q else config.MAX_K} for q in queries]
 
             found_news = distinct_documents(self.__vectorstore.search(queries))
             found_news_formatted = "\n\n".join([
