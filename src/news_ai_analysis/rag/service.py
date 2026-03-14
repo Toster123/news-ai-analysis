@@ -13,7 +13,7 @@ class Vectorstore():
         self.emb_model = SentenceTransformer(
             embedding_model)
         self.__vectorstore = FAISS.load_local(
-            os.getcwd() + path, self.emb_model, allow_dangerous_deserialization=True)
+            os.getcwd() + path, self.emb_model, allow_dangerous_deserialization=True) if os.path.exists(os.getcwd() + path) else FAISS()
 
     def add_documents(self, documents: list[Document]):
         self.__vectorstore.add_documents(documents)
