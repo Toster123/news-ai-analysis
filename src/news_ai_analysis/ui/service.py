@@ -1,37 +1,27 @@
 """
 Интеллектуальная система мониторинга новостей и трендов
 Веб-интерфейс на Streamlit
-
-Основные разделы:
-1. Управление источниками (полная реализация CRUD)
-2. Лента новостей и агрегация
-3. Анализ тональности
-4. AI Ассистент
-5. Система и мониторинг
-6. Настройки
 """
-
 
 import uuid
 import streamlit as st
-from src.news_ai_analysis.ui.pages.sources import Sources
-from src.news_ai_analysis.ui.pages.feed import Feed
-from src.news_ai_analysis.ui.pages.sentiment import Sentiment
-from src.news_ai_analysis.ui.pages.chat import Chat
-from src.news_ai_analysis.ui.pages.system import System
-from src.news_ai_analysis.ui.pages.settings import Settings
-from src.news_ai_analysis.llm.service import LLM
-from src.news_ai_analysis.assistant.service import Assistant
+from datetime import datetime
+from news_ai_analysis.ui.pages.sources import Sources
+from news_ai_analysis.ui.pages.feed import Feed
+from news_ai_analysis.ui.pages.sentiment import Sentiment
+from news_ai_analysis.ui.pages.chat import Chat
+from news_ai_analysis.ui.pages.system import System
+from news_ai_analysis.ui.pages.settings import Settings
+from news_ai_analysis.ui.utils import toggle_collector
+from news_ai_analysis.collector.service import ParsingService
 
 
 class App:
     def __init__(self):
-        # self.__llm = LLM()
-        # self.__asistant = Assistant(self.__llm)
-        # # TODO
-        # self.__embedder = (llm)
-        # self.__sentiment_evaluator = (llm)
-
+        # Инициализация сервиса парсинга
+        if 'parsing_service' not in st.session_state:
+            st.session_state.parsing_service = ParsingService()
+        
         # Конфигурация страницы
         st.set_page_config(
             page_title="NewsTrend Monitor",
@@ -40,35 +30,32 @@ class App:
             initial_sidebar_state="expanded"
         )
 
-        # ============================================
         # ИНИЦИАЛИЗАЦИЯ СОСТОЯНИЯ (SESSION STATE)
-        # ============================================
-
         if 'sources' not in st.session_state:
-            # Начальные демо-данные
+            # Начальные демо-данные - только RSS источники!
             st.session_state.sources = [
                 {
                     'id': str(uuid.uuid4()),
-                    'name': 'TechCrunch RSS',
+                    'name': 'TechCrunch (AI)',
                     'type': 'rss',
-                    'config': {'url': 'https://techcrunch.com/feed/'},
+                    'config': {'url': 'https://techcrunch.com/category/artificial-intelligence/feed/'},
                     'active': True,
                     'created_at': '2024-01-15 10:00:00'
                 },
                 {
                     'id': str(uuid.uuid4()),
-                    'name': 'BBC World News',
-                    'type': 'gdelt-api',
-                    'config': {'query': 'world news'},
+                    'name': 'The Verge',
+                    'type': 'rss',
+                    'config': {'url': 'https://www.theverge.com/rss/index.xml'},
                     'active': True,
                     'created_at': '2024-01-14 08:30:00'
                 },
                 {
                     'id': str(uuid.uuid4()),
-                    'name': 'Currents News Service',
-                    'type': 'currents-api',
-                    'config': {'api_key': 'sk-xxxx-xxxx'},
-                    'active': False,
+                    'name': 'ArXiv AI',
+                    'type': 'rss',
+                    'config': {'url': 'http://export.arxiv.org/rss/cs.AI'},
+                    'active': True,
                     'created_at': '2024-01-10 14:20:00'
                 }
             ]
@@ -83,6 +70,9 @@ class App:
 
         if 'messages' not in st.session_state:
             st.session_state.messages = []
+            
+        if 'articles' not in st.session_state:
+            st.session_state.articles = []
 
         # Рендер боковой панели и получение выбранной страницы
         current_page = self.render_sidebar()
@@ -99,10 +89,9 @@ class App:
 
         page_classes[current_page]()
 
-
     def render_sidebar(self):
         """Боковая панель с навигацией и управлением сборщиком"""
-
+        
         # Заголовок приложения
         st.sidebar.title("📰 NewsTrend Monitor")
         st.sidebar.markdown("---")
@@ -132,6 +121,8 @@ class App:
         status = st.session_state.collector_status
         if status['running']:
             st.sidebar.success("🟢 Сборщик запущен")
+            if status['last_update']:
+                st.sidebar.caption(f"Последнее обновление: {status['last_update']}")
         else:
             st.sidebar.warning("🔴 Сборщик остановлен")
 
@@ -143,27 +134,48 @@ class App:
                 "▶️ Старт",
                 disabled=status['running'],
                 use_container_width=True,
-                type="primary"
+                type="primary",
+                key="start_collector"
             ):
-                toggle_collector('start')
+                self._start_collector()
                 st.rerun()
 
         with col2:
             if st.button(
                 "⏹️ Стоп",
                 disabled=not status['running'],
-                use_container_width=True
+                use_container_width=True,
+                key="stop_collector"
             ):
-                toggle_collector('stop')
+                self._stop_collector()
+                print("БАНДУРА ЗАПУСТИЛАСЬ 1")
                 st.rerun()
 
         # Метрики сборщика
         st.sidebar.markdown("### 📊 Метрики")
-        if status['running'] and status['start_time']:
-            st.sidebar.info(f"Время работы: {status['start_time']}")
-        st.sidebar.metric("Собрано статей", status['articles_collected'])
+        st.sidebar.metric("Всего собрано статей", status['articles_collected'])
+        
+        # Количество активных источников
+        active_sources = len([s for s in st.session_state.sources if s['active']])
+        st.sidebar.metric("Активных RSS источников", active_sources)
 
         st.sidebar.markdown("---")
         st.sidebar.caption("© 2026 NewsTrend Monitor")
 
         return pages[selected_page]
+    
+    def _start_collector(self):
+        """Запуск сборщика новостей"""
+        service: ParsingService = st.session_state.parsing_service
+        print("БАНДУРА ЗАПУСТИЛАСЬ 2")
+        service.start_background_collection(interval_minutes=15)
+        
+        st.session_state.collector_status['running'] = True
+        st.session_state.collector_status['start_time'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    
+    def _stop_collector(self):
+        """Остановка сборщика новостей"""
+        service = st.session_state.parsing_service
+        service.stop_background_collection()
+        
+        st.session_state.collector_status['running'] = False

@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime
 from typing import Dict
+import uuid
 
 
 # ============================================
@@ -88,3 +89,24 @@ def toggle_collector(action: str):
         st.session_state.collector_status['start_time'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     elif action == 'stop':
         st.session_state.collector_status['running'] = False
+
+def toggle_collector(action: str):
+    """
+    Управление сборщиком (обновленная версия)
+    Теперь работает через сервис парсинга
+    """
+    if 'parsing_service' not in st.session_state:
+        st.error("Сервис парсинга не инициализирован")
+        return
+    
+    service = st.session_state.parsing_service
+    
+    if action == 'start':
+        service.start_background_collection(interval_minutes=15)
+        st.session_state.collector_status['running'] = True
+        st.session_state.collector_status['start_time'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        st.success("✅ Сборщик запущен")
+    elif action == 'stop':
+        service.stop_background_collection()
+        st.session_state.collector_status['running'] = False
+        st.warning("🛑 Сборщик остановлен")

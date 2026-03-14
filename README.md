@@ -1,5 +1,7 @@
 ## Взаимодействие пользователя
 ### Запуск
+С зависимости фигня полная пока что...
+
 - pip install -r requirements.txt
 - streamlit run app.py
 

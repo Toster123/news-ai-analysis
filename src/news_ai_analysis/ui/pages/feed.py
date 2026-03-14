@@ -1,121 +1,124 @@
-from src.news_ai_analysis.ui.utils import *
+"""
+Страница ленты новостей
+"""
+import streamlit as st
+import pandas as pd
+from datetime import datetime, timedelta
+from news_ai_analysis.collector.storage import get_articles, get_sources_stats
 
 
 class Feed:
     def __init__(self):
-        """Раздел: Лента новостей и агрегация"""
-
         st.title("📰 Лента новостей")
-
+        
         # Фильтры
-        st.subheader("Фильтры")
-
-        col1, col2, col3 = st.columns(3)
-
-        with col1:
-            # Выбор источников
-            source_options = ["Все источники"] + [s['name'] for s in st.session_state.sources if s['active']]
-            selected_sources = st.multiselect(
-                "Источники",
-                options=source_options[1:],
-                default=source_options[1:],
-                help="Выберите источники для отображения"
-            )
-
-        with col2:
-            # Ключевые слова
-            keywords = st.text_input(
-                "Ключевые слова",
-                placeholder="Например: AI, технологии, бизнес",
-                help="Фильтр по ключевым словам в заголовках"
-            )
-
-        with col3:
-            # Даты
-            date_range = st.date_input(
-                "Период",
-                value=(),
-                help="Выберите диапазон дат"
-            )
-
-        # Кнопка применения фильтров
-        if st.button("🔍 Применить фильтры", type="primary"):
-            st.rerun()
-
-        st.markdown("---")
-
-        # Демо-данные новостей
-        st.subheader("Новости")
-
-        demo_news = [
-            {
-                'title': 'Искусственный интеллект трансформирует индустрию здравоохранения',
-                'date': '2024-01-20',
-                'source': 'TechCrunch RSS',
-                'summary': 'Н покаовые исследованиязывают, что AI-системы значительно улучшают диагностику заболеваний...',
-                'sentiment': 'Позитивная',
-                'tags': ['AI', 'здравоохранение', 'технологии']
-            },
-            {
-                'title': 'Экономические эксперты предупреждают о возможной рецессии',
-                'date': '2024-01-19',
-                'source': 'BBC World News',
-                'summary': 'Ведущие экономисты мира обсуждают риски глобальной рецессии и её возможные последствия...',
-                'sentiment': 'Негативная',
-                'tags': ['экономика', 'финансы', 'рецессия']
-            },
-            {
-                'title': 'Новая технология квантовых вычислений представлена на конференции',
-                'date': '2024-01-18',
-                'source': 'TechCrunch RSS',
-                'summary': 'Квантовые компьютеры становятся ближе к практическому применению в бизнесе...',
-                'sentiment': 'Нейтральная',
-                'tags': ['квантовые вычисления', 'технологии', 'инновации']
-            }
-        ]
-
-        # Отображение карточек новостей
-        for news in demo_news:
+        self.render_filters()
+        
+        # Лента новостей
+        self.render_feed()
+        
+        # Статистика
+        self.render_stats()
+    
+    def render_filters(self):
+        """Рендер фильтров"""
+        with st.expander("🔍 Фильтры", expanded=True):
+            col1, col2, col3 = st.columns(3)
+            
+            with col1:
+                # Фильтр по источнику
+                sources = list(set(a['source_name'] for a in st.session_state.get('articles', [])))
+                sources.insert(0, "Все источники")
+                selected_source = st.selectbox("Источник", sources)
+            
+            with col2:
+                # Фильтр по дате
+                days = st.selectbox(
+                    "За период",
+                    [1, 3, 7, 14, 30, 90],
+                    format_func=lambda x: f"Последние {x} дней"
+                )
+            
+            with col3:
+                # Фильтр по наличию контента
+                with_content = st.checkbox("Только с полным текстом")
+            
+            # Кнопка обновления
+            if st.button("🔄 Обновить", type="primary"):
+                st.rerun()
+    
+    def render_feed(self):
+        """Рендер ленты новостей"""
+        # Получаем отфильтрованные статьи
+        articles = get_articles(
+            source_name=selected_source if selected_source != "Все источники" else None,
+            days_back=days,
+            with_content=with_content,
+            limit=50
+        )
+        
+        if not articles:
+            st.info("📭 Нет статей для отображения. Запустите сборщик новостей.")
+            return
+        
+        # Отображаем статьи
+        for article in articles:
             with st.container():
-                # Заголовок
-                st.markdown(f"### {news['title']}")
-
-                # Мета-информация
-                col1, col2, col3, col4 = st.columns([1, 1, 1, 2])
+                col1, col2 = st.columns([4, 1])
+                
                 with col1:
-                    st.caption(f"📅 {news['date']}")
+                    st.markdown(f"### [{article['title']}]({article['url']})")
+                    st.caption(f"📅 {article['published_at']} | 📌 {article['source_name']}")
+                    
+                    if article.get('summary'):
+                        with st.expander("📄 Показать текст"):
+                            st.write(article['summary'])
+                    else:
+                        if st.button(f"📥 Загрузить текст", key=f"load_{article['url']}"):
+                            self.load_article_content(article)
+                
                 with col2:
-                    st.caption(f"📰 {news['source']}")
-                with col3:
-                    sentiment_color = "🟢" if news['sentiment'] == 'Позитивная' else ("🔴" if news['sentiment'] == 'Негативная' else "🟡")
-                    st.caption(f"{sentiment_color} {news['sentiment']}")
-                with col4:
-                    st.caption(f"Теги: {', '.join(news['tags'])}")
-
-                # Краткое содержание
-                st.write(news['summary'])
-
-                # Кнопки действий
-                col1, col2 = st.columns([1, 10])
-                with col1:
-                    if st.button("🔗 Открыть", key=f"open_{news['title'][:10]}"):
-                        pass
-                with col2:
-                    if st.button("📊 Детальный анализ", key=f"analyze_{news['title'][:10]}"):
-                        pass
-
-                st.markdown("---")
-
-        # Пагинация
-        st.markdown("### Страницы")
-        col1, col2, col3, col4, col5 = st.columns([1, 1, 2, 1, 1])
-        with col1:
-            st.button("◀ Предыдущая", disabled=True)
-        with col2:
-            st.button("1", type="primary")
-        with col3:
-            st.button("2")
-        with col4:
-            st.button("3")
-        with col5:
-            st.button("Следующая ▶")
+                    # Здесь будут кнопки для анализа
+                    if st.button("🔬 Анализ", key=f"analyze_{article['url']}"):
+                        st.session_state['selected_article'] = article
+                        st.switch_page("pages/sentiment.py")
+                
+                st.divider()
+    
+    def render_stats(self):
+        """Рендер статистики"""
+        with st.sidebar:
+            st.markdown("---")
+            st.subheader("📊 Статистика")
+            
+            stats = get_sources_stats()
+            
+            if stats:
+                # Общая статистика
+                total = sum(s['total'] for s in stats.values())
+                st.metric("Всего статей", total)
+                
+                # Статистика по источникам
+                for source, data in stats.items():
+                    with st.expander(f"📌 {source}"):
+                        st.metric("Статей", data['total'])
+                        st.metric("С полным текстом", data['with_content'])
+                        st.caption(f"Последняя: {data['last_article'][:10]}")
+    
+    async def load_article_content(self, article):
+        """Загрузка полного текста статьи"""
+        with st.spinner("Загружаем текст статьи..."):
+            service = st.session_state.parsing_service
+            content = await service.scrape_article_content(article['url'])
+            
+            if content:
+                # Обновляем статью в session_state
+                for a in st.session_state.articles:
+                    if a['url'] == article['url']:
+                        a['summary'] = content
+                        break
+                
+                st.success("✅ Текст загружен!")
+                st.rerun()
+            else:
+                st.error("❌ Не удалось загрузить текст")

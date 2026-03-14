@@ -1,30 +1,18 @@
-import enum
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Enum
-from sqlalchemy.orm import relationship
 from datetime import datetime
-from src.news_ai_analysis.models import Base
+from sqlalchemy import String, DateTime, Text
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
-class SourceType(str, enum.Enum):
-    RSS = "rss"
-    HTML = "html"
-    API = "api"
+from news_ai_analysis.models import Base
 
-class Source(Base):
-    __tablename__ = "sources"
-    id = Column(Integer, primary_key=True)
-    name = Column(String, nullable=False)
-    type = Column(Enum(SourceType), nullable=False)
-    url = Column(String, nullable=False, unique=True)
-    # можно добавить is_active, period и т.д.
 
-class News(Base):
-    __tablename__ = "news"
-    id = Column(Integer, primary_key=True)
-    title = Column(String, nullable=False)
-    content = Column(String, nullable=True)
-    url = Column(String, nullable=False, unique=True)
-    published_at = Column(DateTime, nullable=True)
-    source_id = Column(Integer, ForeignKey("sources.id"))
-    created_at = Column(DateTime, default=datetime.utcnow)
+class Article(Base):
+    __tablename__ = "articles"
 
-    source = relationship("Source")
+    id: Mapped[int] = mapped_column(primary_key=True)
+    source_name: Mapped[str] = mapped_column(String(100))
+    title: Mapped[str] = mapped_column(String(500))
+    url: Mapped[str] = mapped_column(String(1000), unique=True, index=True)
+    summary: Mapped[str | None] = mapped_column(Text, nullable=True)
+    published_at: Mapped[datetime] = mapped_column(DateTime)
+    created_at: Mapped[datetime] = \
+        mapped_column(DateTime, default=datetime.now)
