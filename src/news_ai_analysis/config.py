@@ -36,4 +36,4 @@ class Config(BaseSettings):
         return cls()
 
 
-config = Config()
+config = Config().load()

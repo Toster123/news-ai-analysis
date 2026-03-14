@@ -1,4 +1,4 @@
-from src.news_ai_analysis.ui.utils import *
+from news_ai_analysis.ui.utils import *
 
 
 class Sentiment:
