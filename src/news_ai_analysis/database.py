@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import (
     async_sessionmaker, create_async_engine
 )
 
-from src.news_ai_analysis.config import config
+from news_ai_analysis.config import config
 
 DATABASE_URL = config.db.db_url
 

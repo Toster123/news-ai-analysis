@@ -12,9 +12,9 @@ from news_ai_analysis.ui.pages.sentiment import Sentiment
 from news_ai_analysis.ui.pages.chat import Chat
 from news_ai_analysis.ui.pages.system import System
 from news_ai_analysis.ui.pages.settings import Settings
-from src.news_ai_analysis.llm.service import LLM
-from src.news_ai_analysis.assistant.service import Assistant
-from src.news_ai_analysis.rag.service import Vectorstore
+from news_ai_analysis.llm.service import LLM
+from news_ai_analysis.assistant.service import Assistant
+from news_ai_analysis.rag.service import Vectorstore
 from news_ai_analysis.ui.utils import toggle_collector
 from news_ai_analysis.collector.service import ParsingService
 
@@ -78,7 +78,7 @@ class App:
 
         if 'messages' not in st.session_state:
             st.session_state.messages = []
-            
+
         if 'articles' not in st.session_state:
             st.session_state.articles = []
 
@@ -99,7 +99,7 @@ class App:
 
     def render_sidebar(self):
         """Боковая панель с навигацией и управлением сборщиком"""
-        
+
         # Заголовок приложения
         st.sidebar.title("📰 NewsTrend Monitor")
         st.sidebar.markdown("---")
@@ -130,7 +130,8 @@ class App:
         if status['running']:
             st.sidebar.success("🟢 Сборщик запущен")
             if status['last_update']:
-                st.sidebar.caption(f"Последнее обновление: {status['last_update']}")
+                st.sidebar.caption(
+                    f"Последнее обновление: {status['last_update']}")
         else:
             st.sidebar.warning("🔴 Сборщик остановлен")
 
@@ -162,28 +163,30 @@ class App:
         # Метрики сборщика
         st.sidebar.markdown("### 📊 Метрики")
         st.sidebar.metric("Всего собрано статей", status['articles_collected'])
-        
+
         # Количество активных источников
-        active_sources = len([s for s in st.session_state.sources if s['active']])
+        active_sources = len(
+            [s for s in st.session_state.sources if s['active']])
         st.sidebar.metric("Активных RSS источников", active_sources)
 
         st.sidebar.markdown("---")
         st.sidebar.caption("© 2026 NewsTrend Monitor")
 
         return pages[selected_page]
-    
+
     def _start_collector(self):
         """Запуск сборщика новостей"""
         service: ParsingService = st.session_state.parsing_service
         print("БАНДУРА ЗАПУСТИЛАСЬ 2")
         service.start_background_collection(interval_minutes=15)
-        
+
         st.session_state.collector_status['running'] = True
-        st.session_state.collector_status['start_time'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    
+        st.session_state.collector_status['start_time'] = datetime.now().strftime(
+            '%Y-%m-%d %H:%M:%S')
+
     def _stop_collector(self):
         """Остановка сборщика новостей"""
         service = st.session_state.parsing_service
         service.stop_background_collection()
-        
+
         st.session_state.collector_status['running'] = False

@@ -1,6 +1,6 @@
 from typing import Dict
 from .config import config
-from src.news_ai_analysis.config import config as global_config
+from news_ai_analysis.config import config as global_config
 from .utils import *
 from llama_cpp import Llama
 
@@ -22,5 +22,6 @@ class LLM():
     def __call__(self, query: str, system_prompt: None | str = None, remove_think_tags: bool = True) -> str:
         messages = [{"role": "user", "content": query}]
         if system_prompt:
-            messages = [{"role": "system", "content": system_prompt}] + messages
+            messages = [
+                {"role": "system", "content": system_prompt}] + messages
         return extract_content(self.create_chat_completion(messages)[-1], remove_think_tags)
