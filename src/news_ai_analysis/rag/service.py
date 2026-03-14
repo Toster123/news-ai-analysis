@@ -3,7 +3,7 @@ from typing import Dict
 from .config import config
 from news_ai_analysis.config import config as global_config
 from .utils import *
-from sentence_transformers import SentenceTransformer
+# from sentence_transformers import SentenceTransformer
 from google import genai
 from google.genai import types
 from langchain_community.vectorstores import FAISS
@@ -12,7 +12,7 @@ from langchain_core.documents import Document
 
 class GoogleEmbedder():
     def __init__(self):
-        self.client = genai.Client()
+        self.client = genai.Client(api_key="AIzaSyA0Ya9_61Me7R51hgOcYh7J-US12afkaG0")
 
     def __call__(self, text):
         return self.client.models.embed_content(

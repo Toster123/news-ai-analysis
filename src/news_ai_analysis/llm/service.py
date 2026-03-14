@@ -2,7 +2,7 @@ from typing import Dict
 from .config import config
 from news_ai_analysis.config import config as global_config
 from .utils import *
-from llama_cpp import Llama
+# from llama_cpp import Llama
 from groq import Groq
 
 
