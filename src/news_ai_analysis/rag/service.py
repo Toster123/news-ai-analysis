@@ -24,7 +24,7 @@ class GoogleEmbedder():
 class Vectorstore():
     def __init__(self, path: str = config.VECTOR_STORE_PATH, embedding_model: str = config.EMBEDDING_MODEL):
         self.emb_model = SentenceTransformer(
-            embedding_model) if global_config.DISABLE_LOCAL_MODELS else GoogleEmbedder()
+            embedding_model) if not global_config.DISABLE_LOCAL_MODELS else GoogleEmbedder()
         self.__vectorstore = FAISS.load_local(
             os.getcwd() + path, self.emb_model, allow_dangerous_deserialization=True) if os.path.exists(os.getcwd() + path) else FAISS()
 
