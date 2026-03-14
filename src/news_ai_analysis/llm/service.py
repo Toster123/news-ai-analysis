@@ -19,12 +19,7 @@ class LLM():
         messages.append({"role": "assistant", "content": self.llm.create_chat_completion(
             messages=messages)['choices'][0]['message']['content'] if not global_config.DISABLE_LOCAL_MODELS else self.llm.chat.completions.create(
             model="moonshotai/kimi-k2-instruct",
-            messages=[
-                {
-                    "role": "user",
-                    "content": "say hi"
-                }
-            ],
+            messages=messages,
             max_completion_tokens=8192,
             top_p=1,
         ).choices[0].message.content})
